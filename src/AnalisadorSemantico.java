@@ -194,6 +194,14 @@ public class AnalisadorSemantico {
             }
             return "logico";
         }
+        if (op.equals("+") || op.equals("-")) {
+            if (!isNumerico(tipoOperando)) {
+                throw new ErroCompilacao(
+                    "Operador unario '" + op + "' requer operando numerico, mas e " + tipoOperando,
+                    no.getLinha());
+            }
+            return tipoOperando;
+        }
         throw new ErroCompilacao("Operador unario desconhecido: " + op, no.getLinha());
     }
 
@@ -257,7 +265,7 @@ public class AnalisadorSemantico {
     // ---------------------------------------------------------------
 
     private void verificarDeclarada(String nome, int linha) {
-        if (!tabela.contem(nome)) {
+        if (tabela.getTipo(nome) == null) {
             throw new ErroCompilacao("Variavel '" + nome + "' nao declarada", linha);
         }
     }

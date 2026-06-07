@@ -53,7 +53,7 @@ javac -d out/production/Compilador src/*.java
 ### Executar
 
 ```bash
-java -cp out/production/Compilador Main <arquivo.lc> <saida.asm>
+java -cp out/production/Compilador BRL <arquivo.lc> <saida.asm>
 ```
 
 **Parâmetros:**
@@ -102,20 +102,25 @@ Conforme a seção 2.4 do enunciado:
 
 ```
 inteiro   caractere  logico    real
-se        enquanto   leitura   escrita
+se        senao      enquanto  faca
+leitura   escrita    inicio    fim
+div       mod        verdadeiro falso
 ou        &&         ==        =
 (         )          <         >
 <>        >=         <=
 +         -          *         /
-;         :          inicio    fim
-div       mod        verdadeiro falso
-senao     faca
+;         :
 ```
 
-> **Observação sobre divergências do enunciado:**
-> - `entao` é usado na sintaxe do `se` (seção 2.10) mas não consta na lista de palavras reservadas (seção 2.4). Foi adicionado como palavra reservada para que a gramática funcione.
-> - A negação lógica aparece como `not` na seção 2.6 (precedência), mas não consta na lista de palavras reservadas. O compilador aceita tanto `nao` quanto `not` como sinônimos.
-> - Constantes com sinal (`+5`, `-3`) são descritas na seção 2.11 mas tratadas como operador unário pelo analisador sintático, não pelo léxico.
+> **Observações sobre o enunciado:**
+>
+> | # | Seção(ões) | Observação | Decisão adotada |
+> |---|-----------|------------|-----------------|
+> | 1 | 2.4 × 2.10 | `entao` é utilizado na sintaxe do `se` (seção 2.10) mas não constava na lista de palavras reservadas (seção 2.4). Provável omissão do enunciado. | Adicionado como palavra reservada — consta na tabela acima |
+> | 2 | 2.11 | A seção 2.11 define como regra **léxica** que constantes numéricas podem ter `+`/`-` antes dos dígitos (`+5`, `-3`). Como `+` e `-` também são operadores binários, a ambiguidade é resolvida tratando o sinal como operador **unário** no analisador sintático (`expUnaria`). | Sinal tratado pelo analisador sintático, não pelo léxico |
+> | 3 | 2.4 × 2.6 | A seção 2.6 utiliza `not` para negação lógica, mas a seção 2.4 não lista nem `not` nem `nao` como palavra reservada. | Aceitos ambos: `nao` (português) como forma primária e `not` como alias — os dois produzem o mesmo token |
+> | 4 | 2.4 × 2.10 | A seção 2.4 reserva `leitura` e `escrita`, mas a seção 2.10 usa `leia` e `escreva` na sintaxe dos comandos. | Aceitos os quatro: `leitura`/`leia` e `escrita`/`escreva` mapeiam ao mesmo token |
+> | 5 | 2.6 | A tabela de precedência da seção 2.6 lista `*`, `&&`, `/`, `div` no nível 3 (multiplicativo), mas omite `mod`. | `mod` tratado como operador multiplicativo (nível 3), junto com `div` |
 
 ### 3.3 Operadores
 
@@ -124,12 +129,12 @@ senao     faca
 | Relacionais | `==` `<>` `<` `>` `<=` `>=` |
 | Aditivos | `+` `-` `ou` |
 | Multiplicativos | `*` `/` `div` `mod` `&&` |
-| Unário lógico | `nao` |
+| Unário lógico | `nao` / `not` |
 | Atribuição | `:=` |
 
-**Precedência** (maior para menor):
+**Precedência** (maior para menor), conforme seção 2.6 do enunciado:
 1. `()` — parênteses
-2. `nao` — negação lógica
+2. `nao` / `not`, `+` unário, `-` unário
 3. `*` `/` `div` `mod` `&&`
 4. `+` `-` `ou`
 5. `==` `<>` `<` `>` `<=` `>=`
@@ -347,13 +352,11 @@ cmd_se       ::= 'se' exp 'entao' 'inicio' bloco_instr 'fim'
 cmd_enquanto ::= 'enquanto' exp 'faca' 'inicio' bloco_instr 'fim'
 cmd_leitura  ::= 'leitura' '(' ID (',' ID)* ')' ';'
 cmd_escrita  ::= 'escrita' '(' exp ')' ';'
-exp          ::= expOu
-expOu        ::= expE ('ou' expE)*
-expE         ::= expRel ('&&' expRel)*
+exp          ::= expRel
 expRel       ::= expAdit (RELOP expAdit)?
-expAdit      ::= expMult (('+' | '-') expMult)*
-expMult      ::= expUnaria (('*'|'/'|'div'|'mod') expUnaria)*
-expUnaria    ::= 'nao' expUnaria | expPrimaria
+expAdit      ::= expMult (('+' | '-' | 'ou') expMult)*
+expMult      ::= expUnaria (('*'|'/'|'div'|'mod'|'&&') expUnaria)*
+expUnaria    ::= 'nao' expUnaria | ('+' | '-') expUnaria | expPrimaria
 expPrimaria  ::= ID | CONST_INT | CONST_REAL | CONST_STR
                | 'verdadeiro' | 'falso' | '(' exp ')'
 ```
@@ -466,7 +469,8 @@ Erro na linha <N>: <descrição>
 | Tipo incompatível | `Erro na linha 9: Tipo incompativel: variavel 'x' e inteiro mas expressao e caractere` |
 | Condição do SE não lógica | `Erro na linha 12: Condicao do SE deve ser logica, mas e inteiro` |
 | Condição do ENQUANTO não lógica | `Erro na linha 8: Condicao do ENQUANTO deve ser logica, mas e real` |
-| Operador com tipo errado | `Erro na linha 5: Operador 'nao' requer operando logico, mas e inteiro` |
+| Operador lógico com tipo errado | `Erro na linha 5: Operador 'nao' requer operando logico, mas e inteiro` |
+| Operador unário aritmético com tipo errado | `Erro na linha 5: Operador unario '-' requer operando numerico, mas e logico` |
 
 ---
 
@@ -538,7 +542,7 @@ fim
 ```
 Compilador-BRL/
 ├── src/
-│   ├── Main.java                 # Orquestrador: cria TabelaSimbolos e executa as 3 fases
+│   ├── BRL.java                  # Ponto de entrada (classe BRL): cria TabelaSimbolos e executa as 3 fases
 │   ├── ErroCompilacao.java       # Exceção com mensagem e número de linha
 │   ├── TipoToken.java            # Enum de todos os tipos de token
 │   ├── Token.java                # Token com tipo, lexema e linha

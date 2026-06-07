@@ -15,13 +15,11 @@ import java.io.IOException;
  *   cmd_enquanto → ENQUANTO exp FACA INICIO bloco_instr FIM
  *   cmd_leitura  → LEITURA '(' ID (',' ID)* ')' ';'
  *   cmd_escrita  → ESCRITA '(' exp ')' ';'
- *   exp          → expOu
- *   expOu        → expE (OU expE)*
- *   expE         → expRel (E_LOGICO expRel)*
+ *   exp          → expRel
  *   expRel       → expAdit (RELOP expAdit)?
- *   expAdit      → expMult (('+' | '-') expMult)*
- *   expMult      → expUnaria (('*'|'/'|DIV|MOD) expUnaria)*
- *   expUnaria    → NAO expUnaria | expPrimaria
+ *   expAdit      → expMult (('+' | '-' | OU) expMult)*
+ *   expMult      → expUnaria (('*'|'/'|DIV|MOD|E_LOGICO) expUnaria)*
+ *   expUnaria    → NAO expUnaria | ('+' | '-') expUnaria | expPrimaria
  *   expPrimaria  → ID | CONST_INT | CONST_REAL | CONST_STR
  *                | VERDADEIRO | FALSO | '(' exp ')'
  */
@@ -262,35 +260,7 @@ public class AnalisadorSintatico {
     // ---------------------------------------------------------------
 
     private No parseExpressao() throws IOException {
-        return parseExpOu();
-    }
-
-    // expOu → expE (OU expE)*
-    private No parseExpOu() throws IOException {
-        No esq = parseExpE();
-        while (verifica(TipoToken.OU)) {
-            String op = atual.getLexema(); int linha = atual.getLinha();
-            avancar();
-            No dir = parseExpE();
-            No no = new No(TipoNo.OP_BINARIO, op, linha);
-            no.addFilho(esq); no.addFilho(dir);
-            esq = no;
-        }
-        return esq;
-    }
-
-    // expE → expRel (E_LOGICO expRel)*
-    private No parseExpE() throws IOException {
-        No esq = parseExpRel();
-        while (verifica(TipoToken.E_LOGICO)) {
-            String op = atual.getLexema(); int linha = atual.getLinha();
-            avancar();
-            No dir = parseExpRel();
-            No no = new No(TipoNo.OP_BINARIO, op, linha);
-            no.addFilho(esq); no.addFilho(dir);
-            esq = no;
-        }
-        return esq;
+        return parseExpRel();
     }
 
     // expRel → expAdit (RELOP expAdit)?
@@ -313,10 +283,10 @@ public class AnalisadorSintatico {
                t == TipoToken.MENOR_IGUAL || t == TipoToken.MAIOR_IGUAL;
     }
 
-    // expAdit → expMult (('+' | '-') expMult)*
+    // expAdit → expMult (('+' | '-' | OU) expMult)*
     private No parseExpAdit() throws IOException {
         No esq = parseExpMult();
-        while (verifica(TipoToken.MAIS) || verifica(TipoToken.MENOS)) {
+        while (verifica(TipoToken.MAIS) || verifica(TipoToken.MENOS) || verifica(TipoToken.OU)) {
             String op = atual.getLexema(); int linha = atual.getLinha();
             avancar();
             No dir = parseExpMult();
@@ -327,7 +297,7 @@ public class AnalisadorSintatico {
         return esq;
     }
 
-    // expMult → expUnaria (('*'|'/'|DIV|MOD) expUnaria)*
+    // expMult → expUnaria (('*'|'/'|DIV|MOD|&&) expUnaria)*
     private No parseExpMult() throws IOException {
         No esq = parseExpUnaria();
         while (isMulop(atual.getTipo())) {
@@ -342,17 +312,26 @@ public class AnalisadorSintatico {
     }
 
     private boolean isMulop(TipoToken t) {
-        return t == TipoToken.MULT || t == TipoToken.DIV_OP ||
-               t == TipoToken.DIV  || t == TipoToken.MOD;
+        return t == TipoToken.MULT    || t == TipoToken.DIV_OP ||
+               t == TipoToken.DIV     || t == TipoToken.MOD    ||
+               t == TipoToken.E_LOGICO;
     }
 
-    // expUnaria → NAO expUnaria | expPrimaria
+    // expUnaria → NAO expUnaria | ('+' | '-') expUnaria | expPrimaria
     private No parseExpUnaria() throws IOException {
         if (verifica(TipoToken.NAO)) {
             int linha = atual.getLinha();
             avancar();
             No operando = parseExpUnaria();
             No no = new No(TipoNo.OP_UNARIO, "nao", linha);
+            no.addFilho(operando);
+            return no;
+        }
+        if (verifica(TipoToken.MAIS) || verifica(TipoToken.MENOS)) {
+            String op = atual.getLexema(); int linha = atual.getLinha();
+            avancar();
+            No operando = parseExpUnaria();
+            No no = new No(TipoNo.OP_UNARIO, op, linha);
             no.addFilho(operando);
             return no;
         }

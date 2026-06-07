@@ -26,7 +26,7 @@ public class AnalisadorLexico {
         PALAVRAS_RESERVADAS.put("escreva",    TipoToken.ESCRITA);
         PALAVRAS_RESERVADAS.put("ou",         TipoToken.OU);
         PALAVRAS_RESERVADAS.put("nao",        TipoToken.NAO);
-        PALAVRAS_RESERVADAS.put("not",        TipoToken.NAO); // alias conforme secao 2.6
+        PALAVRAS_RESERVADAS.put("not",        TipoToken.NAO); // alias conforme seção 2.6
         PALAVRAS_RESERVADAS.put("div",        TipoToken.DIV);
         PALAVRAS_RESERVADAS.put("mod",        TipoToken.MOD);
         PALAVRAS_RESERVADAS.put("verdadeiro", TipoToken.VERDADEIRO);
@@ -45,6 +45,11 @@ public class AnalisadorLexico {
         this.charAtual = reader.read();
     }
 
+    // Conforme seção 2.8: apenas espaço (0x20) e quebra de linha (0x0D / 0x0A)
+    private boolean isDelimitador(int c) {
+        return c == ' ' || c == '\n' || c == '\r';
+    }
+
     // ---------------------------------------------------------------
     private void avancar() throws IOException {
         if (charAtual == '\n') linha++;
@@ -54,7 +59,7 @@ public class AnalisadorLexico {
     // ---------------------------------------------------------------
     public Token proximoToken() throws IOException {
 
-        while (charAtual != -1 && Character.isWhitespace(charAtual)) {
+        while (charAtual != -1 && isDelimitador(charAtual)) {
             avancar();
         }
 
@@ -182,7 +187,7 @@ public class AnalisadorLexico {
                 if (charAtual == '&') { avancar(); return new Token(TipoToken.E_LOGICO, "&&", linhaToken); }
                 throw new ErroCompilacao("Simbolo invalido: '&' (use '&&' para E logico)", linhaToken);
 
-            // Caracteres permitidos pelo spec (secao 2.2) mas sem token proprio fora de strings
+            // Caracteres permitidos pelo spec (seção 2.2) mas sem token próprio fora de strings
             case '\'': case '\\': case '|': case '!': case '?':
                 throw new ErroCompilacao(
                     "Simbolo '" + c + "' valido apenas dentro de strings", linhaToken);

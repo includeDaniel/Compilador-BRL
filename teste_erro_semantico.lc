@@ -1,0 +1,16 @@
+/* Teste de erro SEMÂNTICO
+   Erro esperado: Tipo incompativel — variavel 'contador' e inteiro mas expressao e caractere
+   O programa e lexicamente e sintaticamente correto.
+   O erro so pode ser detectado na fase semantica, ao verificar compatibilidade de tipos. */
+
+inicio testeErroSemantico ;
+  contador : inteiro ;
+  nome     : caractere ;
+
+  contador := 0 ;
+  nome     := "BRL" ;
+
+  contador := nome ;   /* ERRO SEMANTICO: nao e possivel atribuir 'caractere' a 'inteiro' */
+
+  escrita(contador) ;
+fim

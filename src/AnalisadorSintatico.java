@@ -137,7 +137,7 @@ public class AnalisadorSintatico {
             case TIPO_CARACTERE: avancar(); return "caractere";
             default:
                 throw new ErroCompilacao(
-                    "Tipo invalido: '" + atual.getLexema() + "'", atual.getLinha());
+                    "Tipo inválido: '" + atual.getLexema() + "'", atual.getLinha());
         }
     }
 
@@ -162,7 +162,7 @@ public class AnalisadorSintatico {
             case ESCRITA:  return parseEscrita();
             default:
                 throw new ErroCompilacao(
-                    "Instrucao invalida: '" + atual.getLexema() + "'", atual.getLinha());
+                    "Instrução inválida: '" + atual.getLexema() + "'", atual.getLinha());
         }
     }
 
@@ -323,7 +323,7 @@ public class AnalisadorSintatico {
             int linha = atual.getLinha();
             avancar();
             No operando = parseExpUnaria();
-            No no = new No(TipoNo.OP_UNARIO, "nao", linha);
+            No no = new No(TipoNo.OP_UNARIO, "not", linha);
             no.addFilho(operando);
             return no;
         }
@@ -375,7 +375,7 @@ public class AnalisadorSintatico {
             }
             default:
                 throw new ErroCompilacao(
-                    "Expressao invalida: '" + atual.getLexema() + "'", linha);
+                    "Expressão inválida: '" + atual.getLexema() + "'", linha);
         }
     }
 }

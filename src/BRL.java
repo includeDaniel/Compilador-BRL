@@ -11,9 +11,10 @@
  */
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
- * Ponto de entrada do compilador BRL.
+ * Autores: Giovanna Silva Penido, João Victor Lisboa e Daniel Nunes
  *
  * Uso: BRL <arquivo.lc> <saida.asm>
  *
@@ -24,7 +25,9 @@ import java.io.*;
  */
 public class BRL {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UnsupportedEncodingException {
+        System.setOut(new PrintStream(System.out, true, StandardCharsets.UTF_8));
+        System.setErr(new PrintStream(System.err, true, StandardCharsets.UTF_8));
 
         if (args.length < 2) {
             System.err.println("Uso: BRL <arquivo.lc> <saida.asm>");
@@ -41,7 +44,7 @@ public class BRL {
         try {
             lexer = new AnalisadorLexico(new FileReader(arquivoFonte), tabela);
         } catch (FileNotFoundException e) {
-            System.err.println("Erro: arquivo nao encontrado: " + arquivoFonte);
+            System.err.println("Erro: arquivo não encontrado: " + arquivoFonte);
             System.exit(1);
             return;
         } catch (IOException e) {

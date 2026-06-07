@@ -56,7 +56,7 @@ public class AnalisadorSemantico {
                 // Se já tem tipo definido, foi declarada antes → erro de redeclaração
                 if (tabela.getTipo(nome) != null) {
                     throw new ErroCompilacao(
-                        "Variavel '" + nome + "' ja foi declarada", noId.getLinha());
+                        "Variável '" + nome + "' já foi declarada", noId.getLinha());
                 }
                 tabela.definirTipo(nome, tipo, tabela.getToken(nome));
             }
@@ -81,7 +81,7 @@ public class AnalisadorSemantico {
             case LEITURA:  analisarLeitura(no);  break;
             case ESCRITA:  analisarEscrita(no);  break;
             default:
-                throw new ErroCompilacao("No de instrucao inesperado", no.getLinha());
+                throw new ErroCompilacao("Nó de instrução inesperado", no.getLinha());
         }
     }
 
@@ -98,8 +98,8 @@ public class AnalisadorSemantico {
 
         if (!tiposCompativeis(tipoVar, tipoExp)) {
             throw new ErroCompilacao(
-                "Tipo incompativel: variavel '" + nomeVar + "' e " + tipoVar +
-                " mas expressao e " + tipoExp, no.getLinha());
+                "Tipo incompatível: variável '" + nomeVar + "' é " + tipoVar +
+                " mas expressão é " + tipoExp, no.getLinha());
         }
         noExp.setTipoDado(tipoExp);
     }
@@ -110,7 +110,7 @@ public class AnalisadorSemantico {
         String tipoCond = inferirTipo(cond);
         if (!tipoCond.equals("logico")) {
             throw new ErroCompilacao(
-                "Condicao do SE deve ser logica, mas e " + tipoCond, cond.getLinha());
+                "Condição do SE deve ser lógica, mas é " + tipoCond, cond.getLinha());
         }
         analisarBlocoInstr(no.getFilho(1));
         if (no.numFilhos() == 3) analisarBlocoInstr(no.getFilho(2));
@@ -122,7 +122,7 @@ public class AnalisadorSemantico {
         String tipoCond = inferirTipo(cond);
         if (!tipoCond.equals("logico")) {
             throw new ErroCompilacao(
-                "Condicao do ENQUANTO deve ser logica, mas e " + tipoCond, cond.getLinha());
+                "Condição do ENQUANTO deve ser lógica, mas é " + tipoCond, cond.getLinha());
         }
         analisarBlocoInstr(no.getFilho(1));
     }
@@ -177,7 +177,7 @@ public class AnalisadorSemantico {
                 break;
 
             default:
-                throw new ErroCompilacao("No de expressao inesperado", no.getLinha());
+                throw new ErroCompilacao("Nó de expressão inesperado", no.getLinha());
         }
         no.setTipoDado(tipo);
         return tipo;
@@ -187,22 +187,22 @@ public class AnalisadorSemantico {
         String op   = no.getValor();
         String tipoOperando = inferirTipo(no.getFilho(0));
 
-        if (op.equals("nao")) {
+        if (op.equals("not")) {
             if (!tipoOperando.equals("logico")) {
                 throw new ErroCompilacao(
-                    "Operador 'nao' requer operando logico, mas e " + tipoOperando, no.getLinha());
+                    "Operador 'not' requer operando lógico, mas é " + tipoOperando, no.getLinha());
             }
             return "logico";
         }
         if (op.equals("+") || op.equals("-")) {
             if (!isNumerico(tipoOperando)) {
                 throw new ErroCompilacao(
-                    "Operador unario '" + op + "' requer operando numerico, mas e " + tipoOperando,
+                    "Operador unário '" + op + "' requer operando numérico, mas é " + tipoOperando,
                     no.getLinha());
             }
             return tipoOperando;
         }
-        throw new ErroCompilacao("Operador unario desconhecido: " + op, no.getLinha());
+        throw new ErroCompilacao("Operador unário desconhecido: " + op, no.getLinha());
     }
 
     private String inferirTipoBinario(No no) {
@@ -215,7 +215,7 @@ public class AnalisadorSemantico {
             op.equals(">")  || op.equals("<=") || op.equals(">=")) {
             if (!tiposCompativeis(esq, dir)) {
                 throw new ErroCompilacao(
-                    "Operador '" + op + "' com operandos incompativeis: " + esq + " e " + dir,
+                    "Operador '" + op + "' com operandos incompatíveis: " + esq + " e " + dir,
                     no.getLinha());
             }
             return "logico";
@@ -225,7 +225,7 @@ public class AnalisadorSemantico {
         if (op.equals("ou") || op.equals("&&")) {
             if (!esq.equals("logico") || !dir.equals("logico")) {
                 throw new ErroCompilacao(
-                    "Operador '" + op + "' requer operandos logicos", no.getLinha());
+                    "Operador '" + op + "' requer operandos lógicos", no.getLinha());
             }
             return "logico";
         }
@@ -241,7 +241,7 @@ public class AnalisadorSemantico {
 
             if (!isNumerico(esq) || !isNumerico(dir)) {
                 throw new ErroCompilacao(
-                    "Operador '" + op + "' requer operandos numericos, mas sao: " + esq + " e " + dir,
+                    "Operador '" + op + "' requer operandos numéricos, mas são: " + esq + " e " + dir,
                     no.getLinha());
             }
 
@@ -266,7 +266,7 @@ public class AnalisadorSemantico {
 
     private void verificarDeclarada(String nome, int linha) {
         if (tabela.getTipo(nome) == null) {
-            throw new ErroCompilacao("Variavel '" + nome + "' nao declarada", linha);
+            throw new ErroCompilacao("Variável '" + nome + "' não declarada", linha);
         }
     }
 

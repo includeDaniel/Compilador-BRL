@@ -25,8 +25,7 @@ public class AnalisadorLexico {
         PALAVRAS_RESERVADAS.put("escrita",    TipoToken.ESCRITA);
         PALAVRAS_RESERVADAS.put("escreva",    TipoToken.ESCRITA);
         PALAVRAS_RESERVADAS.put("ou",         TipoToken.OU);
-        PALAVRAS_RESERVADAS.put("nao",        TipoToken.NAO);
-        PALAVRAS_RESERVADAS.put("not",        TipoToken.NAO); // alias conforme seção 2.6
+        PALAVRAS_RESERVADAS.put("not",        TipoToken.NAO); // negação lógica conforme seção 2.6
         PALAVRAS_RESERVADAS.put("div",        TipoToken.DIV);
         PALAVRAS_RESERVADAS.put("mod",        TipoToken.MOD);
         PALAVRAS_RESERVADAS.put("verdadeiro", TipoToken.VERDADEIRO);
@@ -99,7 +98,7 @@ public class AnalisadorLexico {
                 avancar();
             }
         }
-        throw new ErroCompilacao("Comentario nao fechado (falta */)", linhaInicio);
+        throw new ErroCompilacao("Comentário não fechado (falta */)", linhaInicio);
     }
 
     // ---------------------------------------------------------------
@@ -108,13 +107,13 @@ public class AnalisadorLexico {
         StringBuilder sb = new StringBuilder();
         while (charAtual != -1 && charAtual != '"') {
             if (charAtual == '\n' || charAtual == '\r') {
-                throw new ErroCompilacao("String nao fechada antes da quebra de linha", linhaInicio);
+                throw new ErroCompilacao("String não fechada antes da quebra de linha", linhaInicio);
             }
             sb.append((char) charAtual);
             avancar();
         }
         if (charAtual == '"') { avancar(); return new Token(TipoToken.CONST_STR, "\"" + sb + "\"", linhaInicio); }
-        throw new ErroCompilacao("String nao fechada antes do fim do arquivo", linhaInicio);
+        throw new ErroCompilacao("String não fechada antes do fim do arquivo", linhaInicio);
     }
 
     // ---------------------------------------------------------------
@@ -126,7 +125,7 @@ public class AnalisadorLexico {
         if (charAtual == '.') {
             sb.append('.'); avancar();
             if (!Character.isDigit(charAtual))
-                throw new ErroCompilacao("Numero real malformado: '" + sb + "' (faltam digitos apos o ponto)", linhaInicio);
+                throw new ErroCompilacao("Número real malformado: '" + sb + "' (faltam dígitos após o ponto)", linhaInicio);
             while (charAtual != -1 && Character.isDigit(charAtual)) {
                 sb.append((char) charAtual); avancar();
             }
@@ -185,15 +184,15 @@ public class AnalisadorLexico {
                 return new Token(TipoToken.MAIOR, ">", linhaToken);
             case '&':
                 if (charAtual == '&') { avancar(); return new Token(TipoToken.E_LOGICO, "&&", linhaToken); }
-                throw new ErroCompilacao("Simbolo invalido: '&' (use '&&' para E logico)", linhaToken);
+                throw new ErroCompilacao("Símbolo inválido: '&' (use '&&' para E lógico)", linhaToken);
 
             // Caracteres permitidos pelo spec (seção 2.2) mas sem token próprio fora de strings
             case '\'': case '\\': case '|': case '!': case '?':
                 throw new ErroCompilacao(
-                    "Simbolo '" + c + "' valido apenas dentro de strings", linhaToken);
+                    "Símbolo '" + c + "' válido apenas dentro de strings", linhaToken);
 
             default:
-                throw new ErroCompilacao("Simbolo invalido: '" + c + "'", linhaToken);
+                throw new ErroCompilacao("Símbolo inválido: '" + c + "'", linhaToken);
         }
     }
 }

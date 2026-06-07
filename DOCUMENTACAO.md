@@ -80,7 +80,7 @@ pi                             | real
 ### Saída esperada (erro)
 
 ```
-Erro na linha 6: Variavel 'z' nao declarada
+Erro na linha 6: Variável 'z' não declarada
 ```
 
 ---
@@ -102,14 +102,14 @@ Conforme a seção 2.4 do enunciado:
 
 ```
 inteiro   caractere  logico    real
-se        senao      enquanto  faca
-leitura   escrita    inicio    fim
-div       mod        verdadeiro falso
-ou        &&         ==        =
-(         )          <         >
-<>        >=         <=
-+         -          *         /
-;         :
+se        entao      senao     enquanto
+faca      leitura    escrita   inicio
+fim       div        mod       verdadeiro
+falso     ou         not       &&
+==        =          (         )
+<         >          <>        >=
+<=        +          -         *
+/         ;          :
 ```
 
 > **Observações sobre o enunciado:**
@@ -118,7 +118,7 @@ ou        &&         ==        =
 > |---|-----------|------------|-----------------|
 > | 1 | 2.4 × 2.10 | `entao` é utilizado na sintaxe do `se` (seção 2.10) mas não constava na lista de palavras reservadas (seção 2.4). Provável omissão do enunciado. | Adicionado como palavra reservada — consta na tabela acima |
 > | 2 | 2.11 | A seção 2.11 define como regra **léxica** que constantes numéricas podem ter `+`/`-` antes dos dígitos (`+5`, `-3`). Como `+` e `-` também são operadores binários, a ambiguidade é resolvida tratando o sinal como operador **unário** no analisador sintático (`expUnaria`). | Sinal tratado pelo analisador sintático, não pelo léxico |
-> | 3 | 2.4 × 2.6 | A seção 2.6 utiliza `not` para negação lógica, mas a seção 2.4 não lista nem `not` nem `nao` como palavra reservada. | Aceitos ambos: `nao` (português) como forma primária e `not` como alias — os dois produzem o mesmo token |
+> | 3 | 2.4 × 2.6 | A seção 2.6 utiliza `not` para negação lógica, mas `not` não consta na lista de palavras reservadas da seção 2.4. Provável omissão. | Adicionado como palavra reservada — consta na tabela acima |
 > | 4 | 2.4 × 2.10 | A seção 2.4 reserva `leitura` e `escrita`, mas a seção 2.10 usa `leia` e `escreva` na sintaxe dos comandos. | Aceitos os quatro: `leitura`/`leia` e `escrita`/`escreva` mapeiam ao mesmo token |
 > | 5 | 2.6 | A tabela de precedência da seção 2.6 lista `*`, `&&`, `/`, `div` no nível 3 (multiplicativo), mas omite `mod`. | `mod` tratado como operador multiplicativo (nível 3), junto com `div` |
 
@@ -129,12 +129,12 @@ ou        &&         ==        =
 | Relacionais | `==` `<>` `<` `>` `<=` `>=` |
 | Aditivos | `+` `-` `ou` |
 | Multiplicativos | `*` `/` `div` `mod` `&&` |
-| Unário lógico | `nao` / `not` |
+| Unário lógico | `not` |
 | Atribuição | `:=` |
 
 **Precedência** (maior para menor), conforme seção 2.6 do enunciado:
 1. `()` — parênteses
-2. `nao` / `not`, `+` unário, `-` unário
+2. `not`, `+` unário, `-` unário
 3. `*` `/` `div` `mod` `&&`
 4. `+` `-` `ou`
 5. `==` `<>` `<` `>` `<=` `>=`
@@ -320,14 +320,14 @@ O analisador léxico (`AnalisadorLexico.java`) lê o arquivo fonte caractere a c
 
 | Situação | Mensagem emitida |
 |----------|-----------------|
-| Caractere inválido | `Simbolo invalido: '<char>'` |
-| Caractere permitido fora de string (`'` `\` `\|` `!` `?`) | `Simbolo '<char>' valido apenas dentro de strings` |
-| String não fechada (quebra de linha) | `String nao fechada antes da quebra de linha` |
-| String não fechada (EOF) | `String nao fechada antes do fim do arquivo` |
-| Real malformado (`3.`) | `Numero real malformado: '3.' (faltam digitos apos o ponto)` |
-| Comentário não fechado | `Comentario nao fechado (falta */)` |
+| Caractere inválido | `Símbolo inválido: '<char>'` |
+| Caractere permitido fora de string (`'` `\` `\|` `!` `?`) | `Símbolo '<char>' válido apenas dentro de strings` |
+| String não fechada (quebra de linha) | `String não fechada antes da quebra de linha` |
+| String não fechada (EOF) | `String não fechada antes do fim do arquivo` |
+| Real malformado (`3.`) | `Número real malformado: '3.' (faltam dígitos após o ponto)` |
+| Comentário não fechado | `Comentário não fechado (falta */)` |
 | Identificador muito longo | `Identificador excede o limite de 512 caracteres` |
-| `&` isolado | `Simbolo invalido: '&' (use '&&' para E logico)` |
+| `&` isolado | `Símbolo inválido: '&' (use '&&' para E lógico)` |
 
 ---
 
@@ -356,7 +356,7 @@ exp          ::= expRel
 expRel       ::= expAdit (RELOP expAdit)?
 expAdit      ::= expMult (('+' | '-' | 'ou') expMult)*
 expMult      ::= expUnaria (('*'|'/'|'div'|'mod'|'&&') expUnaria)*
-expUnaria    ::= 'nao' expUnaria | ('+' | '-') expUnaria | expPrimaria
+expUnaria    ::= 'not' expUnaria | ('+' | '-') expUnaria | expPrimaria
 expPrimaria  ::= ID | CONST_INT | CONST_REAL | CONST_STR
                | 'verdadeiro' | 'falso' | '(' exp ')'
 ```
@@ -397,7 +397,7 @@ graph TD
 | `LEITURA` | `[EXP_ID, ...]` |
 | `ESCRITA` | `[expressao]` |
 | `OP_BINARIO(op)` | `[esq, dir]` — valor = operador (`+`, `==`, `&&`, etc.) |
-| `OP_UNARIO(op)` | `[operando]` — valor = `nao` |
+| `OP_UNARIO(op)` | `[operando]` — valor = operador (`not`, `+` ou `-`) |
 
 ---
 
@@ -416,7 +416,7 @@ O analisador semântico (`AnalisadorSemantico.java`) percorre a AST em duas etap
 |----------|-------|
 | Atribuição | Tipo da variável deve ser compatível com o tipo da expressão |
 | Condição `se` / `enquanto` | Expressão deve ser do tipo `logico` |
-| `ou`, `&&`, `nao` | Operandos devem ser `logico` |
+| `ou`, `&&`, `not` | Operandos devem ser `logico` |
 | `+`, `-`, `*`, `/` | Operandos devem ser `inteiro` ou `real` |
 | `div`, `mod` | Operandos devem ser `inteiro` |
 | `+` entre `caractere` | Concatenação de strings |
@@ -445,32 +445,32 @@ Erro na linha <N>: <descrição>
 
 | Situação | Exemplo de mensagem |
 |----------|---------------------|
-| Caractere inválido | `Erro na linha 9: Simbolo invalido: '@'` |
-| String não fechada | `Erro na linha 5: String nao fechada antes da quebra de linha` |
-| Real malformado | `Erro na linha 7: Numero real malformado: '3.' (faltam digitos apos o ponto)` |
-| Comentário não fechado | `Erro na linha 2: Comentario nao fechado (falta */)` |
-| `&` isolado | `Erro na linha 4: Simbolo invalido: '&' (use '&&' para E logico)` |
+| Caractere inválido | `Erro na linha 9: Símbolo inválido: '@'` |
+| String não fechada | `Erro na linha 5: String não fechada antes da quebra de linha` |
+| Real malformado | `Erro na linha 7: Número real malformado: '3.' (faltam dígitos após o ponto)` |
+| Comentário não fechado | `Erro na linha 2: Comentário não fechado (falta */)` |
+| `&` isolado | `Erro na linha 4: Símbolo inválido: '&' (use '&&' para E lógico)` |
 
 ### Erros Sintáticos
 
 | Situação | Exemplo de mensagem |
 |----------|---------------------|
 | Token inesperado | `Erro na linha 10: Esperado 'PONTO_VIRGULA' mas encontrado 'escrita'` |
-| Tipo inválido | `Erro na linha 2: Tipo invalido: 'numero'` |
-| Expressão inválida | `Erro na linha 8: Expressao invalida: ';'` |
-| Instrução inválida | `Erro na linha 6: Instrucao invalida: 'inteiro'` |
+| Tipo inválido | `Erro na linha 2: Tipo inválido: 'numero'` |
+| Expressão inválida | `Erro na linha 8: Expressão inválida: ';'` |
+| Instrução inválida | `Erro na linha 6: Instrução inválida: 'inteiro'` |
 
 ### Erros Semânticos
 
 | Situação | Exemplo de mensagem |
 |----------|---------------------|
-| Variável não declarada | `Erro na linha 6: Variavel 'z' nao declarada` |
-| Variável redeclarada | `Erro na linha 3: Variavel 'x' ja foi declarada` |
-| Tipo incompatível | `Erro na linha 9: Tipo incompativel: variavel 'x' e inteiro mas expressao e caractere` |
-| Condição do SE não lógica | `Erro na linha 12: Condicao do SE deve ser logica, mas e inteiro` |
-| Condição do ENQUANTO não lógica | `Erro na linha 8: Condicao do ENQUANTO deve ser logica, mas e real` |
-| Operador lógico com tipo errado | `Erro na linha 5: Operador 'nao' requer operando logico, mas e inteiro` |
-| Operador unário aritmético com tipo errado | `Erro na linha 5: Operador unario '-' requer operando numerico, mas e logico` |
+| Variável não declarada | `Erro na linha 6: Variável 'z' não declarada` |
+| Variável redeclarada | `Erro na linha 3: Variável 'x' já foi declarada` |
+| Tipo incompatível | `Erro na linha 9: Tipo incompatível: variável 'x' é inteiro mas expressão é caractere` |
+| Condição do SE não lógica | `Erro na linha 12: Condição do SE deve ser lógica, mas é inteiro` |
+| Condição do ENQUANTO não lógica | `Erro na linha 8: Condição do ENQUANTO deve ser lógica, mas é real` |
+| Operador lógico com tipo errado | `Erro na linha 5: Operador 'not' requer operando lógico, mas é inteiro` |
+| Operador unário aritmético com tipo errado | `Erro na linha 5: Operador unário '-' requer operando numérico, mas é lógico` |
 
 ---
 
@@ -531,9 +531,9 @@ fim
 | Arquivo | Propósito | Resultado esperado |
 |---------|-----------|-------------------|
 | `teste.lc` | Programa válido completo — todos os tipos, operadores, estruturas e comandos | `Analise concluida com sucesso` + tabela de símbolos |
-| `teste_erro_lexico.lc` | Contém `@`, caractere inválido | `Erro na linha 9: Simbolo invalido: '@'` |
+| `teste_erro_lexico.lc` | Contém `@`, caractere inválido | `Erro na linha 9: Símbolo inválido: '@'` |
 | `teste_erro_sintatico.lc` | Atribuição sem `;` | `Erro na linha 10: Esperado 'PONTO_VIRGULA' mas encontrado 'escrita'` |
-| `teste_erro_semantico.lc` | Atribuição de `caractere` em variável `inteiro` | `Erro na linha 13: Tipo incompativel: variavel 'contador' e inteiro mas expressao e caractere` |
+| `teste_erro_semantico.lc` | Atribuição de `caractere` em variável `inteiro` | `Erro na linha 13: Tipo incompatível: variável 'contador' é inteiro mas expressão é caractere` |
 
 ---
 

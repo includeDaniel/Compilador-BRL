@@ -34,8 +34,8 @@ inicio testeCompleto ;
 
   /* ── Expressões lógicas ── */
   par       := contador == 0 ;
-  ativo     := nao encontrado ;
-  encontrado := ativo && nao par ;
+  ativo     := not encontrado ;
+  encontrado := ativo && not par ;
   ativo     := par ou encontrado ;
 
   /* ── Expressões relacionais ── */
@@ -79,7 +79,7 @@ inicio testeCompleto ;
   fim
 
   /* ── SE aninhado ── */
-  se ativo && nao encontrado entao inicio
+  se ativo && not encontrado entao inicio
     se taxa > media entao inicio
       acumulador := acumulador + taxa ;
     fim

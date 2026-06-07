@@ -1,0 +1,6 @@
+inicio teste ;
+  x : inteiro ;
+  x := 10 @ 5 ;
+  y := "string nao fechada
+  z := 3. ;
+fim

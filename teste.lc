@@ -1,0 +1,94 @@
+/* ============================================================
+   Programa de teste completo — linguagem BRL
+   Exercita todos os tipos, operadores, estruturas e comandos
+   ============================================================ */
+
+inicio testeCompleto ;
+
+  /* Declarações de todos os tipos */
+  contador, limite, resultado, i : inteiro ;
+  taxa, media, acumulador        : real ;
+  nome, saudacao                 : caractere ;
+  ativo, encontrado, par         : logico ;
+
+  /* ── Atribuições básicas ── */
+  contador  := 0 ;
+  limite    := 10 ;
+  resultado := 1 ;
+  taxa      := 2.5 ;
+  media     := 0.0 ;
+  nome      := "BRL" ;
+  saudacao  := "Ola, Mundo!" ;
+  ativo     := verdadeiro ;
+  encontrado := falso ;
+
+  /* ── Expressões aritméticas inteiras ── */
+  resultado := limite * 2 + 3 ;
+  resultado := resultado div 5 ;
+  resultado := resultado mod 3 ;
+  i         := (limite + contador) * 2 ;
+
+  /* ── Expressões aritméticas reais ── */
+  acumulador := taxa * 4.0 ;
+  media      := acumulador / 2.0 ;
+
+  /* ── Expressões lógicas ── */
+  par       := contador == 0 ;
+  ativo     := nao encontrado ;
+  encontrado := ativo && nao par ;
+  ativo     := par ou encontrado ;
+
+  /* ── Expressões relacionais ── */
+  ativo := contador < limite ;
+  ativo := taxa >= 2.5 ;
+  ativo := contador <> limite ;
+  ativo := resultado <= 10 ;
+
+  /* ── Leitura de múltiplas variáveis ── */
+  leitura(contador, limite) ;
+  leitura(nome) ;
+  leitura(taxa) ;
+
+  /* ── Enquanto com corpo complexo ── */
+  enquanto contador < limite faca inicio
+    resultado := resultado * 2 ;
+    acumulador := acumulador + taxa ;
+    contador := contador + 1 ;
+    par := resultado mod 2 == 0 ;
+
+    se par entao inicio
+      escrita(resultado) ;
+    fim senao inicio
+      escrita(contador) ;
+    fim
+  fim
+
+  /* ── SE sem senao ── */
+  se ativo entao inicio
+    escrita(resultado) ;
+    escrita(acumulador) ;
+  fim
+
+  /* ── SE com senao ── */
+  se contador == limite entao inicio
+    encontrado := verdadeiro ;
+    escrita(nome) ;
+  fim senao inicio
+    encontrado := falso ;
+    escrita(saudacao) ;
+  fim
+
+  /* ── SE aninhado ── */
+  se ativo && nao encontrado entao inicio
+    se taxa > media entao inicio
+      acumulador := acumulador + taxa ;
+    fim
+  fim
+
+  /* ── Escrita de todos os tipos ── */
+  escrita(contador) ;
+  escrita(taxa) ;
+  escrita(ativo) ;
+  escrita(nome) ;
+
+fim

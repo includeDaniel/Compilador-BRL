@@ -1,0 +1,11 @@
+/* Teste de erro SINTÁTICO
+   Erro esperado: Esperado 'PONTO_VIRGULA' mas encontrado 'escrita'
+   A atribuição de 'x' nao foi encerrada com ';', violando a gramática BRL.
+   Todos os tokens sao lexicamente validos, mas a estrutura esta incorreta. */
+
+inicio testeErroSintatico ;
+  x, y : inteiro ;
+
+  x := 42        /* ERRO SINTATICO: falta ';' ao final da atribuicao */
+  escrita(x) ;
+fim

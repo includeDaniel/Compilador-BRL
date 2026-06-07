@@ -1,0 +1,12 @@
+/* Teste de erro LÉXICO
+   Erro esperado: Simbolo invalido: '@'
+   O caractere '@' nao pertence ao conjunto de simbolos permitidos pela linguagem BRL.
+   O analisador lexico lanca a excecao diretamente, antes de qualquer analise sintatica. */
+
+inicio testeErroLexico ;
+  x : inteiro ;
+
+  x := 10 @ 5 ;   /* ERRO LEXICO: '@' e um caractere invalido */
+
+  escrita(x) ;
+fim

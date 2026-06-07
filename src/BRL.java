@@ -18,11 +18,11 @@ import java.io.*;
  * Uso: BRL <arquivo.lc> <saida.asm>
  *
  * Fases implementadas:
- *   1. Analisador Lexico    — tokenizacao do codigo fonte
- *   2. Analisador Sintatico — verificacao gramatical e construcao da AST
- *   3. Analisador Semantico — verificacao de tipos e declaracoes
+ *   1. Analisador Léxico    — tokenização do código fonte
+ *   2. Analisador Sintático — verificação gramatical e construção da AST
+ *   3. Analisador Semântico — verificação de tipos e declarações
  */
-public class Main {
+public class BRL {
 
     public static void main(String[] args) {
 
@@ -32,13 +32,11 @@ public class Main {
         }
 
         String arquivoFonte = args[0];
-        // args[1] = arquivo .asm (reservado para a fase de geracao de codigo)
+        String arquivoSaida = args[1];
 
-        // A tabela e criada antes do lexico para que os IDs sejam
-        // registrados assim que forem encontrados no fonte.
         TabelaSimbolos tabela = new TabelaSimbolos();
 
-        // ── Fase 1: Analise Lexica ─────────────────────────────────
+        // ── Fase 1: Análise Léxica ─────────────────────────────────
         AnalisadorLexico lexer;
         try {
             lexer = new AnalisadorLexico(new FileReader(arquivoFonte), tabela);
@@ -52,7 +50,7 @@ public class Main {
             return;
         }
 
-        // ── Fase 2: Analise Sintatica ──────────────────────────────
+        // ── Fase 2: Análise Sintática ──────────────────────────────
         No arvore;
         try {
             AnalisadorSintatico parser = new AnalisadorSintatico(lexer);
@@ -67,7 +65,7 @@ public class Main {
             return;
         }
 
-        // ── Fase 3: Analise Semantica ──────────────────────────────
+        // ── Fase 3: Análise Semântica ──────────────────────────────
         try {
             AnalisadorSemantico semantico = new AnalisadorSemantico(tabela);
             semantico.analisar(arvore);
@@ -80,16 +78,11 @@ public class Main {
         System.out.println("Analise concluida com sucesso: " + arquivoFonte);
         tabela.imprimir();
 
-        // ── Saída: cria arquivo .asm indicando que a geração de código
-        //          será implementada em etapa futura do projeto ──────
-        String arquivoSaida = args[1];
+        // ── Saída: arquivo .asm (geração de código reservada para etapa futura) ──
         try (PrintWriter asm = new PrintWriter(new FileWriter(arquivoSaida))) {
             asm.println("; Compilador BRL");
-            asm.println("; Autores: Giovanna Penido, jOÃO Victor Lisboa, Daniel Nunes");
-            asm.println(";");
+            asm.println("; Autores: Giovanna Penido, Joao Victor Lisboa, Daniel Nunes");
             asm.println("; Arquivo gerado a partir de: " + arquivoFonte);
-            asm.println(";");
-            asm.println("; ATENÇÃO: Main.java cria sempre um .asm vazio para cumprir a interface formalmente sem gerar código real.");
         } catch (IOException e) {
             System.err.println("Erro ao criar arquivo de saida: " + e.getMessage());
             System.exit(1);
